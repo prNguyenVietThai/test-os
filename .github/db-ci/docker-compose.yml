@@ -2,7 +2,7 @@ version: '3'
 
 services:
   clipping-opensearch-ci:
-    build: .
+    build: opensearch
     container_name: clipping-opensearch-ci
     environment:
       cluster.name: "docker-cluster" # name the cluster
