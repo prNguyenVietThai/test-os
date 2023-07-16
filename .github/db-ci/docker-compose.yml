@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  clipping-opensearch-ci:
+    build: .
+    container_name: clipping-opensearch-ci
+    environment:
+      cluster.name: "docker-cluster" # name the cluster
+      discovery.type: "single-node" # cluster with only 1 node
+      network.host: "0.0.0.0" # listen on all available network
+      plugins.security.disabled: "true" # disable security in local environment
+      DISABLE_INSTALL_DEMO_CONFIG: "true" # disable the installation of the demo configuration files during the initial setup of an OpenSearch cluster
+      OPENSEARCH_JAVA_OPTS: "-Xms512M -Xmx512M" # set min and max JVM heap sizes
+    ports:
+      - "9200:9200"
+  # TODO: 後でMysql,Mongoを追加する

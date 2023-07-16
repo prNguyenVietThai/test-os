@@ -1,0 +1,52 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2.6'
+
+      - name: Install Dependencies
+        run: composer install
+
+      - name: Build opensearch
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+          cd .github/db-ci && docker-compose up -d
+
+      - name: Health Check API
+        id: health-check
+        timeout-minutes: 1
+        run: |
+          response_code=0
+          while [ $response_code -ne 200 ]; do
+            echo "Health Check ..."
+            response_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:9200)
+            sleep 5
+          done
+          echo "Health Check Passed"
+
+      - name: Test opensearch healthcheck
+        run: |
+          docker ps
+          curl 
+
+      - name: PHP Unit
+        run: composer test
